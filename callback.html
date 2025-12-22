@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ログイン処理</title>
+</head>
+<body>
+
+<p>ログイン処理中…</p>
+
+<script>
+const code = new URLSearchParams(location.search).get("code");
+
+// ① アクセストークン取得
+fetch("https://api.line.me/oauth2/v2.1/token", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded"
+  },
+  body: new URLSearchParams({
+    grant_type: "authorization_code",
+    code: code,
+    redirect_uri: "https://ssmax412.github.io/line-login-test/callback.html",
+    client_id: "2008748952",
+    client_secret: "2d7d322fda54527e5a8802ab42d3b8e8"
+  })
+})
+.then(res => res.json())
+.then(token => {
+
+  // ② プロフィール取得
+  return fetch("https://api.line.me/v2/profile", {
+    headers: {
+      "Authorization": "Bearer " + token.access_token
+    }
+  });
+})
+.then(res => res.json())
+.then(profile => {
+
+  // ③ スプレッドシートに送信
+  fetch("https://script.google.com/macros/s/AKfycbzoSu2w-2ZkDS0H-IghsX6njxaHRAOchh7FAe29_n91x4hec4ss1QfxXx6zVjShFz8puA/exec", {
+    method: "POST",
+    body: JSON.stringify({
+      userId: profile.userId,
+      name: profile.displayName
+    })
+  });
+
+  document.body.innerHTML = "<h2>ログイン完了</h2>";
+});
+</script>
+
+</body>
+</html>
