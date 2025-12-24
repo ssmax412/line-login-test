@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>予約フォーム</title>
+</head>
+<body>
+
+<h2>予約フォーム</h2>
+
+<form id="reserveForm">
+  <label>
+    お名前<br>
+    <input type="text" name="name" required>
+  </label>
+  <br><br>
+
+  <label>
+    施術日<br>
+    <input type="date" name="date" required>
+  </label>
+  <br><br>
+
+  <label>
+    メニュー<br>
+    <select name="menu">
+      <option value="カット">カット</option>
+      <option value="カラー">カラー</option>
+      <option value="パーマ">パーマ</option>
+    </select>
+  </label>
+  <br><br>
+
+  <button type="submit">予約する</button>
+</form>
+
+<script>
+  const userId = localStorage.getItem("lineUserId");
+  const userName = localStorage.getItem("lineUserName");
+
+  document.getElementById("reserveForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    if (!userId) {
+      alert("ログインしてください");
+      location.href = "./";
+      return;
+    }
+
+    const formData = new FormData(e.target);
+
+    fetch("https://script.google.com/macros/s/AKfycbzoSu2w-2ZkDS0H-IghsX6njxaHRAOchh7FAe29_n91x4hec4ss1QfxXx6zVjShFz8puA/exec", {
+      method: "POST",
+      body: JSON.stringify({
+        userId: userId,
+        name: formData.get("name"),
+        date: formData.get("date"),
+        menu: formData.get("menu")
+      })
+    });
+
+    alert("予約を受け付けました");
+  });
+</script>
+
+</body>
+</html>
